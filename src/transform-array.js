@@ -1,50 +1,35 @@
 const CustomError = require("../extensions/custom-error");
 
 module.exports = function transform(arr) {
-  if(arr.length === 0){
-    return [];
-  }
-  else{
-    // for(let i = 0; i < arr.length; i++){
-    //     if(arr[i] === '--discard-next'){
-    //       arr.splice(i, 1);
-    //       arr.splice(i, 1);
-    //     }
-    //     else if(arr[i] === '--discard-prev'){
-    //       arr.splice(i, 1);
-    //       arr.splice(i - 1, 1);
-    //     }
-    //     else if(arr[i] === '--double-next'){
-    //       arr.splice(i, 1);
-    //       arr.splice(i + 1, 0, arr[i]);
-    //     }
-    //     else if(arr[i] === '--double-prev'){
-    //       arr.splice(i, 1);
-    //       arr.splice(i - 1, 0, arr[i - 1]);
-    //     }
-    // }
-    for(let i = 0; i < arr.length; i++){
-      for(let j = 0; j < arr[i].length; j++){
-        if(arr[i][j] === '--discard-next'){
-          arr.splice(j, 1);
-          arr.splice(j, 1);
-        }
-        else if(arr[i][j] === '--discard-prev'){
-          arr.splice(j, 1);
-          arr.splice(j - 1, 1);
-        }
-        else if(arr[i] === '--double-next'){
-          arr.splice(j, 1);
-          arr.splice(j + 1, 0, arr[i][j]);
-        }
-        else if(arr[i] === '--double-prev'){
-          arr.splice(j, 1);
-          arr.splice(j - 1, 0, arr[i][j - 1]);
-        }
-      }
+    if (Array.isArray(arr) === false) {
+      throw new Error('THROWN')
+    } else {
+      if (arr.length === 0) return [];
+      let newArr = []
+      let i = 0;
+      let isDel = false;
+      arr.forEach((el, index) => {
+          if (el !== '--double-next' && el !== '--discard-next' && el !== '--double-prev' && el !== '--discard-prev') {
+              if (arr[index - 1] === '--double-next' || arr[index - 1] === '--discard-next') {
+                  if (arr[index - 1] === '--discard-next') isDel = true;
+                  if (arr[index - 1] === '--double-next') newArr[i++] = el
+              }
+              if (isDel == false && (arr[index + 1] === '--double-prev' || arr[index + 1] === '--discard-prev')) {
+                  if (arr[index + 1] === '--discard-prev') {
+                      newArr[i++] = el
+                      i--;
+                      newArr.pop()
+                      isDel = true;
+                  }
+                  if (arr[index + 1] === '--double-prev')
+                      newArr[i++] = el
+              }
+              if (isDel == false) newArr[i++] = el
+              isDel = false;
+          }
+      })
+      return newArr
     }
-    return arr;
   }
-}
   
     
